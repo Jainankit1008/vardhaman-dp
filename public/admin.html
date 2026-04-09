@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Vardhaman DP Stats</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#D4A017;--teal:#0f5c4a;--bg:#fdf8ef;--card:#fff;--text:#1a1209;--text2:#5a4a2a;--text3:#9a8a6a;--border:#e8d9b8}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);padding:0 0 40px}
+header{background:linear-gradient(135deg,#1a0a00,#0f5c4a);padding:20px 24px;color:#fff;display:flex;align-items:center;justify-content:space-between}
+header h1{font-family:'Cinzel',serif;font-size:16px;color:#F5D06A}
+header p{font-size:12px;color:rgba(245,208,106,.6)}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-val{font-size:28px;font-weight:700;color:var(--teal)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h2{font-family:'Cinzel',serif;font-size:14px;color:var(--teal);margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:hover td{background:#fffbf0}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.badge-gold{background:#FFF3CD;color:#856404}
+.badge-teal{background:#d1f0e8;color:#0f5c4a}
+.search{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'Nunito',sans-serif;margin-bottom:12px;outline:none}
+.search:focus{border-color:var(--gold)}
+.login-box{max-width:340px;margin:80px auto;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;text-align:center}
+.login-box h2{font-family:'Cinzel',serif;font-size:16px;color:var(--teal);margin-bottom:6px}
+.login-box p{font-size:13px;color:var(--text3);margin-bottom:18px}
+.login-box input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;margin-bottom:12px;outline:none}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#c8830a,#D4A017);color:#fff;width:100%}
+.empty{text-align:center;padding:30px;color:var(--text3);font-size:13px}
+#adminPanel{display:none}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="login-box">
+    <div style="font-size:32px;margin-bottom:8px">🕉</div>
+    <h2>Admin Dashboard</h2>
+    <p>Enter the admin token to view download statistics</p>
+    <input type="password" id="tokenInput" placeholder="Admin token" onkeydown="if(event.key==='Enter')checkToken()" />
+    <button class="btn" onclick="checkToken()">Access Dashboard</button>
+    <p style="margin-top:10px;font-size:11px;color:#c0392b" id="tokenErr"></p>
+    <p style="margin-top:8px;font-size:11px;color:var(--text3)">No token set? Leave blank if ADMIN_TOKEN env var is not configured.</p>
+  </div>
+</div>
+
+<div id="adminPanel">
+  <header>
+    <div>
+      <h1>Vardhaman Varshitapotsav — Download Stats</h1>
+      <p>Real-time download tracking</p>
+    </div>
+    <button onclick="loadData()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px">↻ Refresh</button>
+  </header>
+
+  <div class="container">
+
+    <!-- Summary cards -->
+    <div class="summary">
+      <div class="stat-card"><div class="stat-val" id="sumTotal">—</div><div class="stat-label">Total Downloads</div></div>
+      <div class="stat-card"><div class="stat-val" id="sumUsers">—</div><div class="stat-label">Unique Users</div></div>
+      <div class="stat-card"><div class="stat-val" id="sumDPs">—</div><div class="stat-label">Unique DPs</div></div>
+    </div>
+
+    <!-- Top users -->
+    <div class="card">
+      <h2>Top Users by Downloads</h2>
+      <table>
+        <thead><tr><th>#</th><th>Email</th><th>Total Downloads</th><th>Unique DPs</th></tr></thead>
+        <tbody id="totalsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- All records -->
+    <div class="card">
+      <h2>All Download Records</h2>
+      <input class="search" type="text" id="searchInp" placeholder="Search by email or name…" oninput="filterRows()" />
+      <table>
+        <thead><tr><th>Email</th><th>Name</th><th>Downloads</th><th>First</th><th>Last</th></tr></thead>
+        <tbody id="allBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let allRows = [];
+let adminToken = '';
+
+function checkToken() {
+  adminToken = document.getElementById('tokenInput').value.trim();
+  loadData();
+}
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/admin/stats', {
+      headers: adminToken ? { 'x-admin-token': adminToken } : {}
+    });
+    if (res.status === 401) {
+      document.getElementById('tokenErr').textContent = 'Invalid token';
+      return;
+    }
+    const data = await res.json();
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    renderStats(data);
+  } catch(e) {
+    document.getElementById('tokenErr').textContent = 'Could not connect to server';
+  }
+}
+
+function renderStats({ rows, totals }) {
+  allRows = rows;
+
+  const totalDL = totals.reduce((s,r) => s + r.total_downloads, 0);
+  document.getElementById('sumTotal').textContent = totalDL;
+  document.getElementById('sumUsers').textContent = totals.length;
+  document.getElementById('sumDPs').textContent   = rows.length;
+
+  const tb = document.getElementById('totalsBody');
+  if (!totals.length) { tb.innerHTML = '<tr><td colspan="4" class="empty">No data yet</td></tr>'; }
+  else tb.innerHTML = totals.slice(0,20).map((r,i) => `
+    <tr>
+      <td><span class="badge ${i===0?'badge-gold':'badge-teal'}">${i+1}</span></td>
+      <td>${esc(r.email)}</td>
+      <td><strong>${r.total_downloads}</strong></td>
+      <td>${r.unique_dps}</td>
+    </tr>`).join('');
+
+  renderAll(rows);
+}
+
+function renderAll(rows) {
+  const tb = document.getElementById('allBody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" class="empty">No records found</td></tr>'; return; }
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.email)}</td>
+      <td>${esc(r.name)}</td>
+      <td><span class="badge badge-teal">${r.count}</span></td>
+      <td style="font-size:11px;color:var(--text3)">${fmtDate(r.first_at)}</td>
+      <td style="font-size:11px;color:var(--text3)">${fmtDate(r.last_at)}</td>
+    </tr>`).join('');
+}
+
+function filterRows() {
+  const q = document.getElementById('searchInp').value.toLowerCase();
+  const filtered = allRows.filter(r =>
+    r.email.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
+  );
+  renderAll(filtered);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' })
+    + ' ' + d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+}
+</script>
+</body>
+</html>
