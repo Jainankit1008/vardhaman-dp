@@ -9,12 +9,23 @@ services:
         value: production
       - key: PORT
         value: 3000
+<<<<<<< HEAD
       # ── Supabase (persistent database — free tier) ──────────────────────────
       # Get these from: supabase.com → your project → Settings → API
       - key: SUPABASE_URL
-        value: https://YOUR_PROJECT_ID.supabase.co
-      - key: SUPABASE_KEY
-        value: YOUR_ANON_OR_SERVICE_ROLE_KEY
+        value: https://oacwjiikqofhcnuyutpn.supabase.co
+      - key: sb_publishable_0LxT1U691LPDyH_TN4JKKw_kDeUaRqJ
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hY3dqaWlrcW9maGNudXl1dHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTcwODAsImV4cCI6MjA5MTMzMzA4MH0.vV8ttQ-avagGXzgqVjgZqFaXpxgxer8pYbHBSEuovHI
       # ── Admin dashboard protection ──────────────────────────────────────────
       - key: ADMIN_TOKEN
-        value: changeme123
+        value: Ankit123
+=======
+      # Set ADMIN_TOKEN to a secret string to protect the admin dashboard
+      # e.g. ADMIN_TOKEN=mysecrettoken123
+      - key: ADMIN_TOKEN
+        value: Ankit123
+      # DATA_DIR: on Render free tier the filesystem is ephemeral.
+      # Upgrade to a paid plan and add a Persistent Disk, then set:
+      # DATA_DIR=/data   (mount the disk at /data in Render settings)
+      # UPLOAD_DIR=/data/uploads
+>>>>>>> 6b5c6237b4f9c11545d0ce5d94864605c0e71089
