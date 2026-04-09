@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vardhaman Varshitapotsav — DP Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ── Reset & tokens ──────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#D4A017;
+  --gold2:#F5D06A;
+  --teal:#0f5c4a;
+  --teal2:#1a8a6a;
+  --bg:#fdf8ef;
+  --card:#fff;
+  --text:#1a1209;
+  --text2:#5a4a2a;
+  --text3:#9a8a6a;
+  --border:#e8d9b8;
+  --shadow:0 2px 16px rgba(100,60,0,.10);
+  --radius:14px;
+  --rad-sm:8px;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);font-size:15px}
+
+/* ── Layout ──────────────────────────────────────────────────── */
+.page{max-width:480px;margin:0 auto;padding:0 16px 40px}
+
+/* ── Header ──────────────────────────────────────────────────── */
+header{
+  background:linear-gradient(135deg,#1a0a00 0%,#3b1a00 50%,#0f5c4a 100%);
+  padding:28px 20px 22px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  margin:0 -16px 28px;
+}
+header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.header-om{font-size:28px;display:block;margin-bottom:4px;filter:drop-shadow(0 0 8px rgba(212,160,23,.6))}
+header h1{
+  font-family:'Cinzel',serif;
+  font-size:18px;font-weight:700;
+  color:var(--gold2);
+  letter-spacing:.5px;
+  text-shadow:0 1px 8px rgba(0,0,0,.5);
+  line-height:1.3;
+  margin-bottom:4px;
+}
+header p{font-size:12px;color:rgba(245,208,106,.7);letter-spacing:.3px}
+
+/* ── Steps indicator ─────────────────────────────────────────── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:24px}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.step-dot{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;
+  border:2px solid var(--border);
+  background:var(--card);
+  color:var(--text3);
+  transition:all .3s;
+}
+.step-dot.done{background:var(--teal2);border-color:var(--teal2);color:#fff}
+.step-dot.active{background:var(--gold);border-color:var(--gold);color:#fff;box-shadow:0 0 0 4px rgba(212,160,23,.2)}
+.step-label{font-size:10px;color:var(--text3);white-space:nowrap}
+.step-label.active{color:var(--gold);font-weight:600}
+.step-label.done{color:var(--teal2);font-weight:600}
+.step-line{width:36px;height:2px;background:var(--border);margin-bottom:18px;transition:background .3s}
+.step-line.done{background:var(--teal2)}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+.card-title{
+  font-family:'Cinzel',serif;
+  font-size:15px;font-weight:600;
+  color:var(--teal);
+  margin-bottom:4px;
+}
+.card-sub{font-size:13px;color:var(--text3);margin-bottom:16px;line-height:1.5}
+
+/* ── Form elements ───────────────────────────────────────────── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--text2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase}
+.field input{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--rad-sm);
+  font-size:15px;font-family:'Nunito',sans-serif;
+  color:var(--text);background:#fdfaf4;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.15)}
+.field-error{font-size:12px;color:#c0392b;margin-top:5px;display:none}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn{
+  width:100%;padding:13px;
+  border-radius:var(--rad-sm);
+  font-size:15px;font-weight:700;
+  font-family:'Nunito',sans-serif;
+  cursor:pointer;border:none;
+  transition:transform .15s,box-shadow .15s,opacity .2s;
+  letter-spacing:.3px;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,#c8830a,#D4A017);color:#fff;box-shadow:0 4px 14px rgba(200,131,10,.35)}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(200,131,10,.45)}
+.btn-success{background:linear-gradient(135deg,#0f5c4a,#1a8a6a);color:#fff;box-shadow:0 4px 14px rgba(15,92,74,.3)}
+.btn-success:hover{box-shadow:0 6px 20px rgba(15,92,74,.4)}
+.btn-ghost{background:#fff;border:1.5px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{background:#faf5eb}
+.btn+.btn{margin-top:10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── Upload zone ─────────────────────────────────────────────── */
+.upload-zone{
+  border:2px dashed var(--border);
+  border-radius:var(--radius);
+  padding:28px 16px;text-align:center;
+  cursor:pointer;transition:all .2s;
+  background:#fdfaf4;position:relative;
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--gold);background:#fffbf0}
+.upload-zone svg{opacity:.35;margin-bottom:10px}
+.upload-zone .uz-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.upload-zone .uz-sub{font-size:12px;color:var(--text3)}
+#fileInput{display:none}
+
+/* ── User chip ───────────────────────────────────────────────── */
+.user-chip{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  background:linear-gradient(135deg,#fff9ee,#fff);
+  border:1px solid var(--border);
+  border-radius:var(--rad-sm);
+  margin-bottom:20px;
+}
+.chip-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),#c8830a);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
+  font-family:'Cinzel',serif;
+  box-shadow:0 2px 8px rgba(200,131,10,.3);
+}
+.chip-info{flex:1;min-width:0}
+.chip-name{font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-email{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-logout{font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Nunito',sans-serif;white-space:nowrap}
+.chip-logout:hover{color:var(--text);border-color:var(--text3)}
+
+/* ── Crop section ────────────────────────────────────────────── */
+.crop-host{
+  position:relative;border-radius:var(--rad-sm);overflow:hidden;
+  background:#1a0a00;touch-action:none;user-select:none;
+  cursor:grab;
+}
+.crop-host:active{cursor:grabbing}
+.crop-host img{display:block;width:100%;pointer-events:none}
+.crop-overlay-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+
+.tools-row{display:flex;gap:8px;margin-top:10px}
+.tool-btn{
+  flex:1;padding:9px 4px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--border);border-radius:var(--rad-sm);
+  background:#fff;color:var(--text2);cursor:pointer;font-family:'Nunito',sans-serif;
+  transition:background .15s,border-color .15s;
+}
+.tool-btn:hover{background:#faf5eb;border-color:var(--gold)}
+
+.zoom-row{display:flex;align-items:center;gap:10px;margin-top:12px}
+.zoom-row span{font-size:12px;color:var(--text3);white-space:nowrap}
+.zoom-row input[type=range]{
+  flex:1;-webkit-appearance:none;height:4px;
+  border-radius:2px;background:var(--border);outline:none;cursor:pointer;
+}
+.zoom-row input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--gold);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.zoom-val{font-size:12px;font-weight:700;color:var(--teal);min-width:38px;text-align:right}
+
+/* ── Preview ─────────────────────────────────────────────────── */
+.preview-frame{
+  border-radius:var(--rad-sm);overflow:hidden;
+  border:1px solid var(--border);
+  background:#1a0a00;
+  text-align:center;
+}
+.preview-frame canvas{display:block;width:100%;max-width:100%}
+
+/* ── Divider ─────────────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── Hint ────────────────────────────────────────────────────── */
+.hint{font-size:11px;color:var(--text3);line-height:1.6;margin-top:10px;text-align:center}
+
+/* ── Screen transitions ──────────────────────────────────────── */
+.screen{display:none;animation:fadeUp .3s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Toast ───────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1a0a00;color:#fff;padding:10px 20px;border-radius:99px;
+  font-size:13px;font-weight:600;white-space:nowrap;
+  transition:transform .3s ease;z-index:999;
+  border:1px solid rgba(212,160,23,.4);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media(max-width:360px){header h1{font-size:15px}.step-line{width:20px}}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="header-om">🕉</span>
+  <h1>Vardhaman Varshitapotsav</h1>
+  <p>श्री वर्धमान जैन मंडल, चेन्नई — DP Generator</p>
+</header>
+
+<div class="page">
+
+  <!-- Steps -->
+  <div class="steps" id="stepsBar">
+    <div class="step-item">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-label active" id="lbl1">Sign In</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-label" id="lbl2">Upload</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot3">3</div>
+      <div class="step-label" id="lbl3">Edit & Download</div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 1: Login ──────────────────────────────────── -->
+  <div id="s1" class="screen active">
+    <div class="card">
+      <div class="card-title">Welcome 🙏</div>
+      <div class="card-sub">Enter your details to create your personalised DP for the event</div>
+      <div class="field">
+        <label>Your Full Name</label>
+        <input type="text" id="inp-name" placeholder="e.g. Rajendra Kumar" autocomplete="name" />
+        <div class="field-error" id="err-name">Please enter your name</div>
+      </div>
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="inp-email" placeholder="you@example.com" autocomplete="email" />
+        <div class="field-error" id="err-email">Please enter a valid email</div>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: Upload ─────────────────────────────────── -->
+  <div id="s2" class="screen">
+    <div id="userChip" class="user-chip">
+      <div class="chip-avatar" id="chipAvatar"></div>
+      <div class="chip-info">
+        <div class="chip-name" id="chipName"></div>
+        <div class="chip-email" id="chipEmail"></div>
+      </div>
+      <button class="chip-logout" onclick="doLogout()">Sign out</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Upload Your Photo</div>
+      <div class="card-sub">Choose a clear face photo. It will be placed in the circular frame on the event template.</div>
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5a4a2a" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <div class="uz-title">Tap to select photo</div>
+        <div class="uz-sub">Or drag & drop here · JPG, PNG, WEBP up to 10 MB</div>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)" />
+      <div class="field-error" id="err-file" style="display:none;margin-top:8px">Please select a valid image file</div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 3: Crop + Preview ────────────────────────── -->
+  <div id="s3" class="screen">
+    <div class="card">
+      <div class="card-title">Position Your Photo</div>
+      <div class="card-sub">Drag to move · Pinch or use slider to zoom · Rotate if needed</div>
+      <div class="crop-host" id="cropHost">
+        <img id="cropImg" alt="template" />
+        <canvas class="crop-overlay-canvas" id="cropOverlay"></canvas>
+      </div>
+      <div class="zoom-row">
+        <span>Zoom</span>
+        <input type="range" id="zoomSlider" min="50" max="300" value="100" step="1" oninput="onZoom()" />
+        <span class="zoom-val" id="zoomVal">100%</span>
+      </div>
+      <div class="tools-row">
+        <button class="tool-btn" onclick="rotateCrop(-90)">↺ Rotate L</button>
+        <button class="tool-btn" onclick="rotateCrop(90)">↻ Rotate R</button>
+        <button class="tool-btn" onclick="resetCrop()">↺ Reset</button>
+        <button class="tool-btn" onclick="document.getElementById('fileInput').click()">📷 Change</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Preview</div>
+      <div class="card-sub">This is exactly how your DP will look when downloaded</div>
+      <div class="preview-frame">
+        <canvas id="previewCanvas"></canvas>
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-success" id="dlBtn" onclick="downloadDP()">⬇ Download My DP</button>
+      <button class="btn btn-ghost" onclick="goBack()">← Change Photo</button>
+      <p class="hint">Saved as high-quality PNG · Share with #tapotsav 🙏</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// Change BASE_URL when you move to a custom domain
+const BASE_URL = window.location.origin;
+
+// Circle position on the template image (fractional coords)
+// cx/cy = center as fraction of image width/height, r = radius as fraction of min(w,h)
+const CIRCLE = { fx: 0.485, fy: 0.395, fr: 0.175 };
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let user     = { name: '', email: '' };
+let rawImg   = null;
+let tmplImg  = null;
+let imgHash  = '';            // client-side hash (filename+size) for tracking
+let cs       = { x:0.5, y:0.5, scale:1, rot:0 };
+let dragging = false, ds = {};
+let raf      = null;
+
+// ── Load template ─────────────────────────────────────────────────────────────
+const tmpl = new Image();
+tmpl.onload  = () => { tmplImg = tmpl; renderPreview(); };
+tmpl.onerror = () => showToast('⚠ Template image not found');
+tmpl.src = BASE_URL + '/template.jpg';
+
+// ── Screen management ─────────────────────────────────────────────────────────
+function showScreen(n) {
+  ['s1','s2','s3'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', i+1 === n);
+  });
+  updateSteps(n);
+}
+
+function updateSteps(active) {
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('dot'+i);
+    const lbl = document.getElementById('lbl'+i);
+    dot.className = 'step-dot ' + (i < active ? 'done' : i === active ? 'active' : '');
+    lbl.className = 'step-label ' + (i < active ? 'done' : i === active ? 'active' : '');
+    if (i < active) dot.textContent = '✓';
+    else dot.textContent = i;
+    if (i < 3) {
+      const line = document.getElementById('line'+i);
+      line.className = 'step-line ' + (i < active ? 'done' : '');
+    }
+  }
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function doLogin() {
+  const name  = document.getElementById('inp-name').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  let ok = true;
+
+  document.getElementById('err-name').style.display  = (!name)  ? 'block' : 'none';
+  document.getElementById('err-email').style.display = (!email || !email.includes('@') || !email.includes('.')) ? 'block' : 'none';
+  if (!name || !email || !email.includes('@') || !email.includes('.')) return;
+
+  user = { name, email };
+  document.getElementById('chipAvatar').textContent = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('chipName').textContent   = name;
+  document.getElementById('chipEmail').textContent  = email;
+  showScreen(2);
+}
+
+function doLogout() {
+  user   = { name:'', email:'' };
+  rawImg = null;
+  document.getElementById('inp-name').value  = '';
+  document.getElementById('inp-email').value = '';
+  showScreen(1);
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
+function handleFile(e) {
+  const f = e.target.files[0];
+  if (!f || !f.type.startsWith('image/')) {
+    document.getElementById('err-file').style.display = 'block'; return;
+  }
+  document.getElementById('err-file').style.display = 'none';
+  imgHash = f.name + '_' + f.size;    // simple stable client hash
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => { rawImg = img; cs = {x:0.5,y:0.5,scale:1,rot:0}; initCrop(); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+}
+
+// ── Crop init ─────────────────────────────────────────────────────────────────
+function initCrop() {
+  const ci = document.getElementById('cropImg');
+  // Show the actual template as background of the crop host
+  ci.src = BASE_URL + '/template.jpg';
+  ci.onload = () => {
+    document.getElementById('zoomSlider').value = 100;
+    document.getElementById('zoomVal').textContent = '100%';
+    setupDrag();
+    schedRender();
+    showScreen(3);
+  };
+}
+
+function goBack() { showScreen(2); }
+
+// ── Zoom / Rotate / Reset ─────────────────────────────────────────────────────
+function onZoom() {
+  const v = parseInt(document.getElementById('zoomSlider').value);
+  document.getElementById('zoomVal').textContent = v + '%';
+  cs.scale = v / 100;
+  schedRender();
+}
+
+function rotateCrop(deg) { cs.rot = (cs.rot + deg + 360) % 360; schedRender(); }
+
+function resetCrop() {
+  cs = { x:0.5, y:0.5, scale:1, rot:0 };
+  document.getElementById('zoomSlider').value = 100;
+  document.getElementById('zoomVal').textContent = '100%';
+  schedRender();
+}
+
+function schedRender() {
+  if (raf) cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(() => { renderOverlay(); renderPreview(); });
+}
+
+// ── Drag ──────────────────────────────────────────────────────────────────────
+function setupDrag() {
+  const host = document.getElementById('cropHost');
+  const img  = document.getElementById('cropImg');
+
+  function gp(e) {
+    const r = img.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: (t.clientX-r.left)/r.width, y: (t.clientY-r.top)/r.height };
+  }
+
+  // Remove old listeners by cloning
+  const nh = host.cloneNode(true);
+  host.parentNode.replaceChild(nh, host);
+  const newHost = document.getElementById('cropHost');
+
+  newHost.addEventListener('mousedown',  e => { dragging=true; const p=gp(e); ds={mx:p.x,my:p.y,cx:cs.x,cy:cs.y}; });
+  newHost.addEventListener('touchstart', e => { dragging=true; const p=gp(e); ds={mx:p.x,my:p.y,cx:cs.x,cy:cs.y}; }, {passive:true});
+
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const p = gp(e);
+    cs.x = Math.max(0, Math.min(1, ds.cx + (p.x - ds.mx)));
+    cs.y = Math.max(0, Math.min(1, ds.cy + (p.y - ds.my)));
+    schedRender();
+  });
+  window.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const p = gp(e);
+    cs.x = Math.max(0, Math.min(1, ds.cx + (p.x - ds.mx)));
+    cs.y = Math.max(0, Math.min(1, ds.cy + (p.y - ds.my)));
+    schedRender();
+  }, {passive:true});
+
+  window.addEventListener('mouseup',  () => { dragging = false; });
+  window.addEventListener('touchend', () => { dragging = false; });
+}
+
+// ── Overlay on crop host ──────────────────────────────────────────────────────
+function renderOverlay() {
+  const img = document.getElementById('cropImg');
+  const cv  = document.getElementById('cropOverlay');
+  const W   = img.offsetWidth, H = img.offsetHeight;
+  if (!W || !H) return;
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  if (!rawImg) return;
+
+  const cx = CIRCLE.fx * W, cy = CIRCLE.fy * H, r = CIRCLE.fr * Math.min(W,H);
+
+  // Draw user photo clipped to circle (preview on template)
+  const iw = rawImg.naturalWidth, ih = rawImg.naturalHeight;
+  const fit = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
+  const sw = iw*fit, sh = ih*fit;
+  const ox = cx - sw*cs.x, oy = cy - sh*cs.y;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+  ctx.translate(cx,cy); ctx.rotate(cs.rot*Math.PI/180); ctx.translate(-cx,-cy);
+  ctx.drawImage(rawImg, ox,oy,sw,sh);
+  ctx.restore();
+
+  // Gold ring
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r+3,0,Math.PI*2);
+  ctx.strokeStyle='rgba(212,160,23,0.9)'; ctx.lineWidth=4; ctx.stroke();
+  ctx.restore();
+
+  // Name overlay on template preview
+  if (user.name) {
+    const nameY = cy + r + Math.min(W,H)*0.07;
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.font=`bold ${Math.round(W*0.048)}px Cinzel,serif`;
+    ctx.fillStyle='#FFD700';
+    ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=8;
+    ctx.fillText(user.name, cx, nameY);
+    ctx.font=`${Math.round(W*0.026)}px Nunito,sans-serif`;
+    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.shadowBlur=4;
+    ctx.fillText('#tapotsav', cx, nameY + W*0.038);
+    ctx.restore();
+  }
+}
+
+// ── Final preview canvas ──────────────────────────────────────────────────────
+function renderPreview() {
+  const cv = document.getElementById('previewCanvas');
+  if (!tmplImg) return;
+
+  const TW = tmplImg.naturalWidth, TH = tmplImg.naturalHeight;
+  cv.width = TW; cv.height = TH;
+  const ctx = cv.getContext('2d');
+
+  ctx.drawImage(tmplImg, 0, 0, TW, TH);
+
+  if (!rawImg) return;
+
+  const cx = CIRCLE.fx * TW, cy = CIRCLE.fy * TH, r = CIRCLE.fr * Math.min(TW,TH);
+
+  // Clip and draw user photo
+  const iw = rawImg.naturalWidth, ih = rawImg.naturalHeight;
+  const fit = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
+  const sw = iw*fit, sh = ih*fit;
+  const ox = cx - sw*cs.x, oy = cy - sh*cs.y;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
+  ctx.translate(cx,cy); ctx.rotate(cs.rot*Math.PI/180); ctx.translate(-cx,-cy);
+  ctx.drawImage(rawImg, ox,oy,sw,sh);
+  ctx.restore();
+
+  // Outer rings
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2);
+  ctx.strokeStyle='rgba(212,160,23,0.9)'; ctx.lineWidth=6; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,r+14,0,Math.PI*2);
+  ctx.strokeStyle='rgba(212,160,23,0.3)'; ctx.lineWidth=2; ctx.stroke();
+  ctx.restore();
+
+  // Name
+  const nameY = cy + r + TH * 0.065;
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font=`bold ${Math.round(TW*0.048)}px serif`;
+  ctx.fillStyle='#FFD700';
+  ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=10;
+  ctx.fillText(user.name || '', cx, nameY);
+  ctx.restore();
+
+  ctx.save();
+  ctx.textAlign='center';
+  ctx.font=`${Math.round(TW*0.026)}px sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('#tapotsav', cx, nameY + TW*0.038);
+  ctx.restore();
+}
+
+// ── Download ──────────────────────────────────────────────────────────────────
+async function downloadDP() {
+  const dlBtn = document.getElementById('dlBtn');
+  dlBtn.disabled = true;
+  dlBtn.textContent = 'Generating…';
+
+  renderPreview();
+
+  await new Promise(r => setTimeout(r, 150));
+
+  const cv = document.getElementById('previewCanvas');
+  const a  = document.createElement('a');
+  const safe = user.name.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+  a.download = 'Vardhaman_DP_' + safe + '.png';
+  a.href = cv.toDataURL('image/png', 1.0);
+  a.click();
+
+  // Track the download
+  try {
+    await fetch(BASE_URL + '/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, name: user.name, imageHash: imgHash })
+    });
+  } catch(e) { /* silently fail — don't block user */ }
+
+  dlBtn.disabled = false;
+  dlBtn.textContent = '⬇ Download My DP';
+  showToast('✅ Downloaded! Share with #tapotsav 🙏');
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── Drag-and-drop on upload zone ──────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) {
+    imgHash = f.name + '_' + f.size;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => { rawImg = img; cs = {x:0.5,y:0.5,scale:1,rot:0}; initCrop(); };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(f);
+  }
+});
+</script>
+</body>
+</html>

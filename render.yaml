@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: vardhaman-dp-generator
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      # Set ADMIN_TOKEN to a secret string to protect the admin dashboard
+      # e.g. ADMIN_TOKEN=mysecrettoken123
+      - key: ADMIN_TOKEN
+        value: changeme123
+      # DATA_DIR: on Render free tier the filesystem is ephemeral.
+      # Upgrade to a paid plan and add a Persistent Disk, then set:
+      # DATA_DIR=/data   (mount the disk at /data in Render settings)
+      # UPLOAD_DIR=/data/uploads
