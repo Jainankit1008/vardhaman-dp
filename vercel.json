@@ -1,7 +1,22 @@
 {
   "version": 2,
+  "functions": {
+    "api/**/*.js": { "maxDuration": 10 }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/server.js" },
-    { "source": "/(.*)", "destination": "/public/$1" }
+    { "source": "/api/admin/stats", "destination": "/api/admin/stats" },
+    { "source": "/api/stats/:email", "destination": "/api/stats/[email]" },
+    { "source": "/api/:path*",       "destination": "/api/:path*" },
+    { "source": "/(.*)",             "destination": "/public/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,x-admin-token" }
+      ]
+    }
   ]
 }
