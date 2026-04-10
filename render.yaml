@@ -14,7 +14,7 @@ services:
       # Get these from: supabase.com → your project → Settings → API
       - key: SUPABASE_URL
         value: https://oacwjiikqofhcnuyutpn.supabase.co
-      - key: sb_publishable_0LxT1U691LPDyH_TN4JKKw_kDeUaRqJ
+      - key: SUPABASE_KEY
         value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hY3dqaWlrcW9maGNudXl1dHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NTcwODAsImV4cCI6MjA5MTMzMzA4MH0.vV8ttQ-avagGXzgqVjgZqFaXpxgxer8pYbHBSEuovHI
       # ── Admin dashboard protection ──────────────────────────────────────────
       - key: ADMIN_TOKEN
