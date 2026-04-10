@@ -166,9 +166,9 @@ header p{font-size:12px;color:rgba(245,208,106,.7);letter-spacing:.3px}
 .crop-host{
   position:relative;border-radius:var(--rad-sm);overflow:hidden;
   background:#1a0a00;touch-action:none;user-select:none;
-  cursor:grab;aspect-ratio:1/1;width:100%;
+  cursor:default;aspect-ratio:1/1;width:100%;pointer-events:none;
 }
-.crop-host:active{cursor:grabbing}
+.crop-host:active{cursor:default}
 .crop-host img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .crop-overlay-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 
@@ -200,7 +200,7 @@ header p{font-size:12px;color:rgba(245,208,106,.7);letter-spacing:.3px}
   background:#1a0a00;
   text-align:center;aspect-ratio:1/1;width:100%;
 }
-.preview-frame canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none}
+.preview-frame canvas{display:block;width:100%;height:100%;touch-action:none;user-select:none;pointer-events:none}
 
 /* ── Divider ─────────────────────────────────────────────────── */
 .divider{height:1px;background:var(--border);margin:16px 0}
@@ -305,7 +305,7 @@ header p{font-size:12px;color:rgba(245,208,106,.7);letter-spacing:.3px}
   <div id="s3" class="screen">
     <div class="card">
       <div class="card-title">Position Your Photo</div>
-      <div class="card-sub">Drag to move · Pinch or use slider to zoom · Rotate if needed</div>
+      <div class="card-sub">Use the slider to zoom · Use buttons to rotate and reset</div>
       <div class="crop-host" id="cropHost">
         <img id="cropImg" alt="template" />
         <canvas class="crop-overlay-canvas" id="cropOverlay"></canvas>
@@ -440,7 +440,6 @@ function initCrop() {
   ci.onload = () => {
     document.getElementById('zoomSlider').value = 100;
     document.getElementById('zoomVal').textContent = '100%';
-    setupDrag();
     schedRender();
     showScreen(3);
   };
@@ -472,40 +471,8 @@ function schedRender() {
 
 // ── Drag ──────────────────────────────────────────────────────────────────────
 function setupDrag() {
-  const host = document.getElementById('cropHost');
-  const img  = document.getElementById('cropImg');
-
-  function gp(e) {
-    const r = img.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return { x: (t.clientX-r.left)/r.width, y: (t.clientY-r.top)/r.height };
-  }
-
-  // Remove old listeners by cloning
-  const nh = host.cloneNode(true);
-  host.parentNode.replaceChild(nh, host);
-  const newHost = document.getElementById('cropHost');
-
-  newHost.addEventListener('mousedown',  e => { dragging=true; const p=gp(e); ds={mx:p.x,my:p.y,cx:cs.x,cy:cs.y}; });
-  newHost.addEventListener('touchstart', e => { dragging=true; const p=gp(e); ds={mx:p.x,my:p.y,cx:cs.x,cy:cs.y}; }, {passive:true});
-
-  window.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const p = gp(e);
-    cs.x = Math.max(0, Math.min(1, ds.cx + (p.x - ds.mx)));
-    cs.y = Math.max(0, Math.min(1, ds.cy + (p.y - ds.my)));
-    schedRender();
-  });
-  window.addEventListener('touchmove', e => {
-    if (!dragging) return;
-    const p = gp(e);
-    cs.x = Math.max(0, Math.min(1, ds.cx + (p.x - ds.mx)));
-    cs.y = Math.max(0, Math.min(1, ds.cy + (p.y - ds.my)));
-    schedRender();
-  }, {passive:true});
-
-  window.addEventListener('mouseup',  () => { dragging = false; });
-  window.addEventListener('touchend', () => { dragging = false; });
+  // Drag functionality disabled - only buttons and zoom slider control the image
+  // Users must use: Rotate buttons, Zoom slider, and Reset button
 }
 
 // ── Overlay on crop host ──────────────────────────────────────────────────────
