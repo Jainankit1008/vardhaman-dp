@@ -347,9 +347,7 @@ const BASE_URL = window.location.origin;
 
 // Circle position on the template image (fractional coords)
 // cx/cy = center as fraction of image width/height, r = radius as fraction of min(w,h)
-const CIRCLE = { fx: 0.485, fy: 0.395, fr: 0.175 };
-
-// ── State ─────────────────────────────────────────────────────────────────────
+const CIRCLE = { fx: 0.50, fy: 0.308, fr: 0.142 };// ── State ─────────────────────────────────────────────────────────────────────
 let user     = { name: '', email: '' };
 let rawImg   = null;
 let tmplImg  = null;
@@ -489,41 +487,32 @@ function renderOverlay() {
 
   const cx = CIRCLE.fx * W, cy = CIRCLE.fy * H, r = CIRCLE.fr * Math.min(W,H);
 
-  // Draw user photo clipped to circle (preview on template)
   const iw = rawImg.naturalWidth, ih = rawImg.naturalHeight;
   const fit = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
   const sw = iw*fit, sh = ih*fit;
   const ox = cx - sw*cs.x, oy = cy - sh*cs.y;
 
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
-  ctx.translate(cx,cy); ctx.rotate(cs.rot*Math.PI/180); ctx.translate(-cx,-cy);
+  ctx.beginPath(); 
+  ctx.arc(cx,cy,r,0,Math.PI*2); 
+  ctx.clip(); 
+  ctx.translate(cx,cy); 
+  ctx.rotate(cs.rot*Math.PI/180); 
+  ctx.translate(-cx,-cy);
   ctx.drawImage(rawImg, ox,oy,sw,sh);
   ctx.restore();
 
-  // Gold ring
-  ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,r+3,0,Math.PI*2);
-  ctx.strokeStyle='rgba(212,160,23,0.9)'; ctx.lineWidth=4; ctx.stroke();
-  ctx.restore();
-
-  // Name overlay on template preview
   if (user.name) {
-    const nameY = cy + r + Math.min(W,H)*0.07;
+    const nameY = cy + r + Math.min(W,H)*0.095; 
     ctx.save();
     ctx.textAlign='center';
-    ctx.font=`bold ${Math.round(W*0.048)}px Cinzel,serif`;
-    ctx.fillStyle='#FFD700';
-    ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=8;
+    ctx.font=`bold ${Math.round(W*0.05)}px sans-serif`;
+    ctx.fillStyle='#C00000'; 
     ctx.fillText(user.name, cx, nameY);
-    ctx.font=`${Math.round(W*0.026)}px Nunito,sans-serif`;
-    ctx.fillStyle='rgba(255,255,255,0.65)'; ctx.shadowBlur=4;
-    ctx.fillText('#tapotsav', cx, nameY + W*0.038);
     ctx.restore();
   }
 }
 
-// ── Final preview canvas ──────────────────────────────────────────────────────
 function renderPreview() {
   const cv = document.getElementById('previewCanvas');
   if (!tmplImg) return;
@@ -538,44 +527,29 @@ function renderPreview() {
 
   const cx = CIRCLE.fx * TW, cy = CIRCLE.fy * TH, r = CIRCLE.fr * Math.min(TW,TH);
 
-  // Clip and draw user photo
   const iw = rawImg.naturalWidth, ih = rawImg.naturalHeight;
   const fit = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
   const sw = iw*fit, sh = ih*fit;
   const ox = cx - sw*cs.x, oy = cy - sh*cs.y;
 
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.clip();
-  ctx.translate(cx,cy); ctx.rotate(cs.rot*Math.PI/180); ctx.translate(-cx,-cy);
+  ctx.beginPath(); 
+  ctx.arc(cx,cy,r,0,Math.PI*2); 
+  ctx.clip();
+  ctx.translate(cx,cy); 
+  ctx.rotate(cs.rot*Math.PI/180); 
+  ctx.translate(-cx,-cy);
   ctx.drawImage(rawImg, ox,oy,sw,sh);
   ctx.restore();
 
-  // Outer rings
-  ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2);
-  ctx.strokeStyle='rgba(212,160,23,0.9)'; ctx.lineWidth=6; ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx,cy,r+14,0,Math.PI*2);
-  ctx.strokeStyle='rgba(212,160,23,0.3)'; ctx.lineWidth=2; ctx.stroke();
-  ctx.restore();
-
-  // Name
-  const nameY = cy + r + TH * 0.065;
+  const nameY = cy + r + TH * 0.10; 
   ctx.save();
   ctx.textAlign='center';
-  ctx.font=`bold ${Math.round(TW*0.048)}px serif`;
-  ctx.fillStyle='#FFD700';
-  ctx.shadowColor='rgba(0,0,0,0.85)'; ctx.shadowBlur=10;
+  ctx.font=`bold ${Math.round(TW*0.052)}px sans-serif`;
+  ctx.fillStyle='#C00000'; 
   ctx.fillText(user.name || '', cx, nameY);
   ctx.restore();
-
-  ctx.save();
-  ctx.textAlign='center';
-  ctx.font=`${Math.round(TW*0.026)}px sans-serif`;
-  ctx.fillStyle='rgba(255,255,255,0.7)';
-  ctx.fillText('#tapotsav', cx, nameY + TW*0.038);
-  ctx.restore();
 }
-
 // ── Download ──────────────────────────────────────────────────────────────────
 async function downloadDP() {
   const dlBtn = document.getElementById('dlBtn');
