@@ -1,8 +1,7 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
-const multer = require('multer');
-const cors = require('cors');
 const path = require('path');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
@@ -19,63 +18,56 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
-
-// Track a download event
+/**
+ * ── DOWNLOAD TRACKING ──────────────────────────────────────────────
+ * Every hit creates a NEW row. 
+ * The 'count' column in Supabase should be set to 'identity' or 'serial'
+ * to auto-increment (1, 2, 3...).
+ */
 app.post('/api/track', async (req, res) => {
-  const { email, name, imageHash } = req.body;
+  const { name, imageHash } = req.body; // imageHash is stored in 'picture' column
+  
   if (!supabase) return res.json({ ok: true, skipped: true });
 
   try {
-    const { data: existing } = await supabase
+    const { data, error } = await supabase
       .from('downloads')
-      .select('id, count')
-      .eq('email', email)
-      .eq('name', name)
-      .eq('image_hash', imageHash)
-      .maybeSingle();
+      .insert([
+        { 
+          name: name || 'Anonymous', 
+          picture: imageHash || 'no-hash'
+        }
+      ])
+      .select('count')
+      .single();
 
-    const now = new Date().toISOString();
+    if (error) throw error;
 
-    if (existing) {
-      await supabase
-        .from('downloads')
-        .update({ count: existing.count + 1, last_at: now })
-        .eq('id', existing.id);
-    } else {
-      await supabase
-        .from('downloads')
-        .insert({ email, name, image_hash: imageHash, count: 1, first_at: now, last_at: now });
-    }
-    res.json({ ok: true });
+    res.json({ ok: true, downloadNumber: data.count });
   } catch (e) {
+    console.error('Tracking error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
 
-// Admin stats
+/**
+ * ── ADMIN STATS ────────────────────────────────────────────────────
+ */
 app.get('/api/admin/stats', async (req, res) => {
   const token = process.env.ADMIN_TOKEN;
   if (token && req.headers['x-admin-token'] !== token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
   try {
-    const { data: rows } = await supabase
+    const { data: rows, error } = await supabase
       .from('downloads')
       .select('*')
-      .order('last_at', { ascending: false });
+      .order('id', { ascending: false });
 
-    const map = {};
-    rows.forEach(r => {
-      if (!map[r.email]) map[r.email] = { email: r.email, total_downloads: 0, unique_dps: 0 };
-      map[r.email].total_downloads += r.count;
-      map[r.email].unique_dps += 1;
-    });
+    if (error) throw error;
     
-    res.json({ rows, totals: Object.values(map).sort((a,b) => b.total_downloads - a.total_downloads) });
+    res.json({ rows });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -85,7 +77,11 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+// IMPORTANT: Export for Vercel
 module.exports = app;
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+  });
+}

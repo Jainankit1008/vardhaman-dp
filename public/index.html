@@ -10,80 +10,44 @@
 /* ── Reset & tokens ──────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --gold:#D4A017;
-  --gold2:#F5D06A;
-  --teal:#0f5c4a;
-  --teal2:#1a8a6a;
-  --bg:#fdf8ef;
-  --card:#fff;
-  --text:#1a1209;
-  --text2:#5a4a2a;
-  --text3:#9a8a6a;
-  --border:#e8d9b8;
-  --shadow:0 4px 24px rgba(60,30,0,.15);
-  --radius:20px;
-  --rad-sm:10px;
+  --gold:#D4A017; --gold2:#F5D06A; --teal:#0f5c4a; --bg:#fdf8ef;
+  --card:#fff; --text:#1a1209; --border:#e8d9b8;
+  --shadow:0 4px 24px rgba(60,30,0,.15); --radius:20px;
 }
-html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);font-size:15px;overflow-x:hidden}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);overflow-x:hidden}
 
-/* ── Modern Layout ───────────────────────────────────────────── */
 .page{max-width:480px;margin:0 auto;padding:0 20px 60px}
 
 header{
   background:linear-gradient(135deg,#1a0a00 0%,#3b1a00 50%,#0f5c4a 100%);
-  padding:40px 20px;
-  text-align:center;
-  position:relative;
-  overflow:hidden;
-  margin-bottom:30px;
-  border-bottom-left-radius: 30px;
-  border-bottom-right-radius: 30px;
+  padding:40px 20px; text-align:center; margin-bottom:30px;
+  border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
 }
-header h1{ font-family:'Cinzel',serif; font-size:22px; color:var(--gold2); text-shadow:0 2px 10px rgba(0,0,0,0.5); }
-header p{ font-size:13px; color:rgba(245,208,106,.8); margin-top:8px; }
+header h1{ font-family:'Cinzel',serif; font-size:22px; color:var(--gold2); }
 
-/* ── Modern Login UI ─────────────────────────────────────────── */
-.login-card {
-  background: var(--card);
-  padding: 35px 25px;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  text-align: center;
-  border: 1px solid var(--border);
+.card {
+  background: var(--card); padding: 30px 20px; border-radius: var(--radius);
+  box-shadow: var(--shadow); text-align: center; border: 1px solid var(--border);
 }
-.login-card h2 { font-family: 'Cinzel', serif; color: var(--teal); margin-bottom: 10px; }
-.login-card p { font-size: 14px; color: var(--text3); margin-bottom: 25px; }
 
 .field{margin-bottom:20px; text-align: left;}
-.field label{display:block; font-size:11px; font-weight:800; color:var(--teal); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px}
-.field input{
-  width:100%; padding:14px; border:2px solid #f0f0f0; border-radius:var(--rad-sm);
-  font-size:15px; transition: all 0.3s ease;
-}
-.field input:focus{ border-color: var(--gold); background: #fff; box-shadow: 0 0 0 4px rgba(212,160,23,0.1); outline: none; }
+.field label{display:block; font-size:11px; font-weight:800; color:var(--teal); margin-bottom:8px; text-transform:uppercase;}
+.field input{ width:100%; padding:14px; border:2px solid #f0f0f0; border-radius:10px; font-size:15px; }
 
-/* ── Interactive Cropper ────────────────────────────────────── */
 .crop-host {
   position:relative; border-radius:var(--radius); overflow:hidden;
-  background:#000; touch-action:none; user-select:none;
-  aspect-ratio:1/1; width:100%; cursor: move;
-  box-shadow: var(--shadow);
+  background:#000; touch-action:none; aspect-ratio:1/1; width:100%; cursor: move;
 }
 .crop-host canvas { width: 100%; height: 100%; display: block; }
 
-/* ── Buttons & UI ────────────────────────────────────────────── */
-.btn{
-  width:100%; padding:15px; border-radius:var(--rad-sm);
-  font-size:16px; font-weight:800; cursor:pointer; border:none;
-  transition:all 0.2s ease;
+.edit-hint {
+  font-size: 13px; color: var(--gold); font-weight: 700; margin-top: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.btn-primary{ background: var(--gold); color:#fff; }
-.btn-success{ background: var(--teal); color:#fff; margin-top: 15px;}
-.btn-ghost { background: transparent; color: var(--text3); margin-top: 10px; font-size: 14px;}
 
-.steps{ display:flex; justify-content:center; gap:10px; margin-bottom:30px; }
-.step-dot{ width:10px; height:10px; border-radius:50%; background: var(--border); transition: 0.3s; }
-.step-dot.active{ background: var(--gold); width: 30px; border-radius: 10px; }
+.btn{ width:100%; padding:15px; border-radius:10px; font-size:16px; font-weight:800; cursor:pointer; border:none; transition:0.2s; }
+.btn-primary{ background: var(--gold); color:#fff; }
+.btn-success{ background: var(--teal); color:#fff; margin-top: 20px;}
 
 .screen{display:none; animation:fadeUp 0.4s ease}
 .screen.active{display:block}
@@ -94,84 +58,53 @@ header p{ font-size:13px; color:rgba(245,208,106,.8); margin-top:8px; }
 
 <header>
   <h1>Vardhaman Varshitapotsav</h1>
-  <p>DP Generator • श्री वर्धमान जैन मंडल</p>
 </header>
 
 <div class="page">
-  <div class="steps">
-    <div class="step-dot active" id="dot1"></div>
-    <div class="step-dot" id="dot2"></div>
-    <div class="step-dot" id="dot3"></div>
-  </div>
-
   <div id="s1" class="screen active">
-    <div class="login-card">
-      <h2>Welcome 🙏</h2>
-      <p>Enter your details to generate your DP</p>
-      <div class="field">
-        <label>Full Name</label>
-        <input type="text" id="inp-name" placeholder="e.g. Ankit Jain" />
+    <div class="card">
+      <h2 style="margin-bottom:10px; color:var(--teal);">Create Your DP</h2>
+      <p style="margin-bottom:25px; color:#666;">Start by selecting your photo</p>
+      <div style="border: 2px dashed var(--border); padding: 50px 20px; border-radius: 15px; cursor: pointer; background:#fdfaf4;" onclick="document.getElementById('fileInput').click()">
+        <p style="color: var(--teal); font-weight: 700;">Tap to Select Photo</p>
+        <p style="font-size:12px; color:#9a8a6a; margin-top:5px;">JPG, PNG or WEBP</p>
       </div>
-      <div class="field">
-        <label>Email Address</label>
-        <input type="email" id="inp-email" placeholder="name@domain.com" />
-      </div>
-      <button class="btn btn-primary" onclick="doLogin()">Get Started →</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)" />
     </div>
   </div>
 
   <div id="s2" class="screen">
-    <div class="login-card">
-      <h2>Upload Photo 📷</h2>
-      <p>Select a clear photo for the circular frame</p>
-      <div style="border: 2px dashed var(--border); padding: 40px; border-radius: 15px; cursor: pointer" onclick="document.getElementById('fileInput').click()">
-        <p style="color: var(--teal); font-weight: 700;">Tap to select</p>
+    <div class="card">
+      <div class="field">
+        <label>Enter Your Name</label>
+        <input type="text" id="inp-name" placeholder="Name to show on DP" oninput="draw()" />
       </div>
-      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)" />
-      <button class="btn btn-ghost" onclick="showScreen(1)">← Back</button>
-    </div>
-  </div>
-
-  <div id="s3" class="screen">
-    <div class="login-card" style="padding: 15px;">
-      <h2 style="margin-bottom: 5px;">Perfect Your DP</h2>
-      <p style="margin-bottom: 15px;">Drag to move • Pinch/Scroll to zoom</p>
       
       <div class="crop-host" id="cropHost">
         <canvas id="mainCanvas"></canvas>
       </div>
+      
+      <div class="edit-hint">
+        <span>👆 Edit: Drag to move • Pinch to zoom</span>
+      </div>
 
-      <button class="btn btn-success" id="dlBtn" onclick="downloadDP()">⬇ Download DP</button>
-      <button class="btn btn-ghost" onclick="showScreen(2)">Change Photo</button>
+      <button class="btn btn-success" id="dlBtn" onclick="downloadDP()">⬇ Download My DP</button>
+      <button class="btn" style="color:#999; margin-top:10px;" onclick="location.reload()">Change Photo</button>
     </div>
   </div>
 </div>
 
 <script>
 const BASE_URL = window.location.origin;
-const CIRCLE = { fx: 0.50, fy: 0.310, fr: 0.142 };
+const CIRCLE = { fx: 0.50, fy: 0.308, fr: 0.142 };
 
-let user = { name: '', email: '' };
 let rawImg = null, tmplImg = null;
-let cs = { x: 0.5, y: 0.5, scale: 1 }; // Crop State
+let cs = { x: 0.5, y: 0.5, scale: 1 };
 let isDragging = false, startX, startY, startTouchDist = 0;
 
-// Load Template
 const tmpl = new Image();
 tmpl.src = BASE_URL + '/template.jpg';
 tmpl.onload = () => { tmplImg = tmpl; };
-
-function doLogin() {
-  user.name = document.getElementById('inp-name').value.trim();
-  user.email = document.getElementById('inp-email').value.trim();
-  if(!user.name || !user.email) return alert("Please fill all fields");
-  showScreen(2);
-}
-
-function showScreen(n) {
-  ['s1','s2','s3'].forEach((id,i) => document.getElementById(id).classList.toggle('active', i+1 === n));
-  ['dot1','dot2','dot3'].forEach((id,i) => document.getElementById(id).classList.toggle('active', i+1 === n));
-}
 
 function handleFile(e) {
   const f = e.target.files[0];
@@ -181,7 +114,8 @@ function handleFile(e) {
     img.onload = () => { 
       rawImg = img; 
       cs = { x: 0.5, y: 0.5, scale: 1 };
-      showScreen(3);
+      document.getElementById('s1').classList.remove('active');
+      document.getElementById('s2').classList.add('active');
       initInteraction();
       draw();
     };
@@ -192,8 +126,6 @@ function handleFile(e) {
 
 function initInteraction() {
   const el = document.getElementById('cropHost');
-  
-  // Mouse Drag
   el.onmousedown = e => { isDragging = true; startX = e.clientX; startY = e.clientY; };
   window.onmousemove = e => {
     if(!isDragging) return;
@@ -204,7 +136,6 @@ function initInteraction() {
   };
   window.onmouseup = () => isDragging = false;
 
-  // Touch Move & Pinch Zoom
   el.ontouchstart = e => {
     isDragging = true;
     if(e.touches.length === 2) {
@@ -228,7 +159,6 @@ function initInteraction() {
   };
   el.ontouchend = () => isDragging = false;
 
-  // Scroll Zoom
   el.onwheel = e => {
     e.preventDefault();
     cs.scale -= e.deltaY * 0.001;
@@ -244,37 +174,52 @@ function draw() {
 
   const size = tmplImg.width;
   cv.width = size; cv.height = size;
-
-  // 1. Draw Template
   ctx.drawImage(tmplImg, 0, 0, size, size);
 
-  // 2. Draw Clipped User Image
   const cx = CIRCLE.fx * size, cy = CIRCLE.fy * size, r = CIRCLE.fr * size;
-  
   ctx.save();
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
 
   const iw = rawImg.width, ih = rawImg.height;
   const aspect = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
   const sw = iw * aspect, sh = ih * aspect;
-  
   ctx.drawImage(rawImg, cx - sw * cs.x, cy - sh * cs.y, sw, sh);
   ctx.restore();
 
-  // 3. Draw Name
+  const name = document.getElementById('inp-name').value;
   const nameY = cy + r + size * 0.10;
   ctx.textAlign = 'center';
-  ctx.font = `bold ${Math.round(size * 0.05)}px sans-serif`;
+  ctx.font = `bold ${Math.round(size * 0.052)}px sans-serif`;
   ctx.fillStyle = '#C00000';
-  ctx.fillText(user.name, cx, nameY);
+  ctx.fillText(name, cx, nameY);
 }
 
 async function downloadDP() {
+  const nameValue = document.getElementById('inp-name').value.trim() || 'User';
   const cv = document.getElementById('mainCanvas');
+
+  // 1. Immediate Download (This always works)
   const link = document.createElement('a');
-  link.download = `Vardhaman_DP_${user.name.replace(/\s/g,'_')}.png`;
+  const safeName = nameValue.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+  link.download = `Vardhaman_DP_${safeName}.png`;
   link.href = cv.toDataURL('image/png', 1.0);
   link.click();
+
+  // 2. Background Tracking (Wrapped to never show an alert/error to user)
+  fetch(`${window.location.origin}/api/track`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      name: nameValue, 
+      imageHash: typeof imgHash !== 'undefined' ? imgHash : 'no-hash' 
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log('Tracked:', data))
+  .catch(err => console.warn('Tracking failed but DP was saved:', err));
+  
+  // Show a success toast instead of an error
+  if(typeof showToast === 'function') showToast('✅ DP Saved Successfully!');
 }
 </script>
 </body>
