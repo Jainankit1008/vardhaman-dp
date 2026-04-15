@@ -145,26 +145,38 @@ function initInteraction() {
     }
   };
   el.ontouchmove = e => {
-    e.preventDefault();
-    if(e.touches.length === 2) {
-      const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-      cs.scale *= (dist / startTouchDist);
-      startTouchDist = dist;
-    } else {
-      cs.x -= (e.touches[0].clientX - startX) / (el.offsetWidth * cs.scale);
-      cs.y -= (e.touches[0].clientY - startY) / (el.offsetHeight * cs.scale);
-      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-    }
-    draw();
-  };
+  e.preventDefault();
+  if(e.touches.length === 2) {
+    const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+    
+    // Calculate the ratio and apply a power factor (1.5) to boost speed
+    let ratio = dist / startTouchDist;
+    cs.scale *= Math.pow(ratio, 1.5); 
+    
+    startTouchDist = dist;
+  } else {
+    // Keep your existing dragging logic here
+    cs.x -= (e.touches[0].clientX - startX) / (el.offsetWidth * cs.scale);
+    cs.y -= (e.touches[0].clientY - startY) / (el.offsetHeight * cs.scale);
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+  }
+  draw();
+};
   el.ontouchend = () => isDragging = false;
 
   el.onwheel = e => {
-    e.preventDefault();
-    cs.scale -= e.deltaY * 0.001;
-    cs.scale = Math.max(0.1, cs.scale);
-    draw();
-  };
+  e.preventDefault();
+  // Increased multiplier from 0.001 to 0.005 for faster response
+  const zoomSpeed = 0.005;
+  const delta = -e.deltaY * zoomSpeed;
+  
+  // Exponential scaling feels smoother and faster
+  cs.scale *= (1 + delta);
+  
+  // Constraints to keep zoom within reasonable limits
+  cs.scale = Math.max(0.1, Math.min(10, cs.scale));
+  draw();
+};
 }
 
 function draw() {
