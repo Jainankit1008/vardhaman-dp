@@ -368,7 +368,7 @@ function isInsideCircle(clientX, clientY) {
   const r  = TMPL.circle.fr * Math.min(rect.width, rect.height);
 
   // Add a small touch buffer so it's easy to hit on mobile
-  const buffer = Math.min(rect.width * 0.04, 24);
+  const buffer = Math.min(rect.width * 0.04, 80);
 
   return Math.hypot(px - cx, py - cy) <= r + buffer;
 }
