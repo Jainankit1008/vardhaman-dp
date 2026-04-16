@@ -1,272 +1,674 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Vardhaman Varshitapotsav — DP Generator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-/* ── Reset & tokens ──────────────────────────────────────────── */
+/* ─── Reset ─────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --gold:#D4A017; --gold2:#F5D06A; --teal:#0f5c4a; --bg:#fdf8ef;
-  --card:#fff; --text:#1a1209; --border:#e8d9b8;
-  --shadow:0 4px 24px rgba(60,30,0,.15); --radius:20px;
+  --gold:#D4A017;--gold2:#F5D06A;
+  --red:#C00000;--red2:#e03030;
+  --teal:#0f5c4a;--teal2:#1a8a6a;
+  --bg:#fff8f8;--card:#fff;
+  --text:#1a0505;--text2:#5a1a1a;--text3:#9a7a7a;
+  --border:#f0d0d0;--shadow:0 4px 28px rgba(160,20,20,.10);
+  --radius:18px;--rad-sm:10px;
 }
-html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);overflow-x:hidden}
+html,body{min-height:100vh;background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);font-size:15px;overflow-x:hidden}
+.page{max-width:460px;margin:0 auto;padding:0 16px 60px}
 
-.page{max-width:480px;margin:0 auto;padding:0 20px 60px}
-
+/* ─── Header ────────────────────────────────────── */
 header{
-  background:linear-gradient(135deg,#1a0a00 0%,#3b1a00 50%,#0f5c4a 100%);
-  padding:40px 20px; text-align:center; margin-bottom:30px;
-  border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+  background:linear-gradient(135deg,#8B0000 0%,#C00000 45%,#8B0000 100%);
+  padding:28px 20px 22px;text-align:center;
+  border-bottom-left-radius:28px;border-bottom-right-radius:28px;
+  margin:0 -16px 28px;position:relative;overflow:hidden;
 }
-header h1{ font-family:'Cinzel',serif; font-size:22px; color:var(--gold2); }
+header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 50%,rgba(255,255,255,.07) 0%,transparent 60%),
+             radial-gradient(circle at 70% 50%,rgba(255,255,255,.05) 0%,transparent 60%);
+}
+.hdr-badge{
+  display:inline-block;background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.25);border-radius:99px;
+  padding:3px 14px;font-size:11px;color:rgba(255,255,255,.85);
+  letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px;
+}
+header h1{
+  font-family:'Cinzel',serif;font-size:19px;font-weight:700;
+  color:#fff;line-height:1.3;margin-bottom:4px;
+  text-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+header p{font-size:11px;color:rgba(255,255,255,.65);letter-spacing:.3px}
 
-.card {
-  background: var(--card); padding: 30px 20px; border-radius: var(--radius);
-  box-shadow: var(--shadow); text-align: center; border: 1px solid var(--border);
+/* ─── Cards ─────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 18px;
+  box-shadow:var(--shadow);margin-bottom:16px;
+}
+.card-title{
+  font-family:'Cinzel',serif;font-size:15px;font-weight:600;
+  color:var(--red);margin-bottom:4px;
+}
+.card-sub{font-size:13px;color:var(--text3);margin-bottom:18px;line-height:1.5}
+
+/* ─── Upload zone ────────────────────────────────── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--radius);
+  padding:32px 16px;text-align:center;cursor:pointer;
+  transition:all .2s;background:#fff9f9;
+}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--red);background:#fff3f3}
+.upload-zone .uz-icon{font-size:36px;display:block;margin-bottom:10px}
+.upload-zone .uz-title{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:4px}
+.upload-zone .uz-sub{font-size:12px;color:var(--text3)}
+#fileInput{display:none}
+
+/* ─── Form field ─────────────────────────────────── */
+.field{margin-bottom:18px}
+.field label{
+  display:block;font-size:11px;font-weight:800;color:var(--red);
+  margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;
+}
+.field input{
+  width:100%;padding:12px 14px;
+  border:2px solid var(--border);border-radius:var(--rad-sm);
+  font-size:15px;font-family:'Nunito',sans-serif;
+  color:var(--text);background:#fff9f9;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.field input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(192,0,0,.10)}
+
+/* ─── Canvas editor ──────────────────────────────── */
+.editor-wrap{position:relative;margin-bottom:14px}
+.editor-label{
+  font-size:11px;font-weight:800;color:var(--red);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;
 }
 
-.field{margin-bottom:20px; text-align: left;}
-.field label{display:block; font-size:11px; font-weight:800; color:var(--teal); margin-bottom:8px; text-transform:uppercase;}
-.field input{ width:100%; padding:14px; border:2px solid #f0f0f0; border-radius:10px; font-size:15px; }
-
-.crop-host {
-  position:relative; border-radius:var(--radius); overflow:hidden;
-  background:#000; touch-action:none; aspect-ratio:1/1; width:100%; cursor: move;
+/*
+ * KEY FIX — touch-action on the host:
+ * We set touch-action:pan-y by default (allows page scroll).
+ * When a touch starts INSIDE the photo circle, JS adds the class
+ * .dragging which sets touch-action:none to take over all gestures.
+ * This is the only reliable cross-browser way to do it.
+ */
+.crop-host{
+  position:relative;border-radius:var(--radius);overflow:hidden;
+  background:#f5f5f5;width:100%;aspect-ratio:1/1;
+  touch-action:pan-y;   /* default: allow vertical scroll */
+  cursor:default;
+  border:2px solid var(--border);
 }
-.crop-host canvas { width: 100%; height: 100%; display: block; }
+.crop-host.dragging{
+  touch-action:none;    /* inside circle: we own all gestures */
+  cursor:grab;
+}
+.crop-host.dragging:active{ cursor:grabbing; }
+.crop-host canvas{display:block;width:100%;height:100%;image-rendering:crisp-edges}
 
-.edit-hint {
-  font-size: 13px; color: var(--gold); font-weight: 700; margin-top: 12px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+/* circle glow indicator when inside hit zone */
+.circle-glow{
+  position:absolute;border-radius:50%;pointer-events:none;
+  border:3px solid transparent;transition:border-color .2s;
+  /* JS sets top/left/width/height from circle coords */
+}
+.crop-host.dragging .circle-glow{ border-color:rgba(192,0,0,.4); }
+
+.gesture-hint{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:12px;font-weight:600;color:var(--text3);margin-top:10px;
+}
+.hint-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff3f3;border:1px solid var(--border);border-radius:99px;
+  padding:5px 12px;font-size:11px;font-weight:700;color:var(--red);
 }
 
-.btn{ width:100%; padding:15px; border-radius:10px; font-size:16px; font-weight:800; cursor:pointer; border:none; transition:0.2s; }
-.btn-primary{ background: var(--gold); color:#fff; }
-.btn-success{ background: var(--teal); color:#fff; margin-top: 20px;}
+/* ─── Buttons ────────────────────────────────────── */
+.btn{
+  width:100%;padding:13px;border-radius:var(--rad-sm);
+  font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;
+  cursor:pointer;border:none;transition:transform .15s,box-shadow .15s;
+  letter-spacing:.3px;
+}
+.btn:active{transform:scale(.98)}
+.btn-dl{
+  background:linear-gradient(135deg,#8B0000,#C00000);
+  color:#fff;box-shadow:0 4px 16px rgba(192,0,0,.35);
+}
+.btn-dl:hover{box-shadow:0 6px 22px rgba(192,0,0,.45)}
+.btn-dl:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-reset{
+  background:#fff;border:2px solid var(--border);
+  color:var(--text3);margin-top:10px;
+}
+.btn-reset:hover{background:#fff9f9;border-color:var(--border)}
 
-.screen{display:none; animation:fadeUp 0.4s ease}
+/* ─── Size badge ─────────────────────────────────── */
+.size-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#fff0f0;border:1px solid #f0c0c0;border-radius:99px;
+  padding:4px 12px;font-size:11px;font-weight:700;color:var(--red);
+  margin-bottom:12px;
+}
+
+/* ─── Screen transitions ─────────────────────────── */
+.screen{display:none;animation:fadeUp .35s ease}
 .screen.active{display:block}
-@keyframes fadeUp{from{opacity:0; transform:translateY(20px)}to{opacity:1; transform:translateY(0)}}
-/* Prevent accidental pull-to-refresh and system gestures */
-body {
-  overscroll-behavior-y: contain;
-  -webkit-tap-highlight-color: transparent;
-}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-/* Optimize Canvas for GPU Rendering */
-#mainCanvas {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  transform: translateZ(0); /* Forces GPU Acceleration */
-  will-change: transform;
+/* ─── Toast ──────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#8B0000;color:#fff;padding:10px 22px;
+  border-radius:99px;font-size:13px;font-weight:700;
+  white-space:nowrap;transition:transform .3s ease;
+  z-index:999;border:1px solid rgba(255,200,200,.3);
 }
+.toast.show{transform:translateX(-50%) translateY(0)}
 
-/* Larger Touch Targets */
-.btn, .edit-hint {
-  min-height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-}
+@media(max-width:360px){header h1{font-size:16px}}
 </style>
 </head>
 <body>
 
 <header>
+  <div class="hdr-badge"> SVJM Chennai</div>
   <h1>Vardhaman Varshitapotsav</h1>
+  <p>वर्षीतप पारणोत्सव — DP Generator</p>
 </header>
 
 <div class="page">
+
+  <!-- ── Screen 1: Upload ── -->
   <div id="s1" class="screen active">
     <div class="card">
-      <h2 style="margin-bottom:10px; color:var(--teal);">Create Your DP</h2>
-      <p style="margin-bottom:25px; color:#666;">Start by selecting your photo</p>
-      <div style="border: 2px dashed var(--border); padding: 50px 20px; border-radius: 15px; cursor: pointer; background:#fdfaf4;" onclick="document.getElementById('fileInput').click()">
-        <p style="color: var(--teal); font-weight: 700;">Tap to Select Photo</p>
-        <p style="font-size:12px; color:#9a8a6a; margin-top:5px;">JPG, PNG or WEBP</p>
+      <div class="card-title">Create Your DP 🙏</div>
+      <div class="card-sub">Upload your photo to place it on the official event template</div>
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <span class="uz-icon">🖼</span>
+        <div class="uz-title">Tap to select your photo</div>
+        <div class="uz-sub">JPG · PNG · WEBP · Max 10 MB</div>
       </div>
-      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)" />
+      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)"/>
     </div>
   </div>
 
+  <!-- ── Screen 2: Edit + Download ── -->
   <div id="s2" class="screen">
     <div class="card">
       <div class="field">
-        <label>Enter Your Name</label>
-        <input type="text" id="inp-name" placeholder="Name to show on DP" oninput="draw()" />
-      </div>
-      
-      <div class="crop-host" id="cropHost">
-        <canvas id="mainCanvas"></canvas>
-      </div>
-      
-      <div class="edit-hint">
-        <span>👆 Edit: Drag to move • Pinch to zoom</span>
+        <label>Your Name</label>
+        <input type="text" id="inp-name" placeholder="Name shown on the DP" oninput="draw()"/>
       </div>
 
-      <button class="btn btn-success" id="dlBtn" onclick="downloadDP()">⬇ Download My DP</button>
-      <button class="btn" style="color:#999; margin-top:10px;" onclick="location.reload()">Change Photo</button>
+      <div class="editor-label">Position Your Photo</div>
+      <div class="editor-wrap">
+        <!--
+          The canvas renders at full template resolution (2000×2000).
+          CSS scales it to 100% of container width.
+          The invisible .circle-glow div tracks the photo circle visually.
+        -->
+        <div class="crop-host" id="cropHost">
+          <canvas id="mainCanvas"></canvas>
+          <div class="circle-glow" id="circleGlow"></div>
+        </div>
+      </div>
+
+      <div class="gesture-hint">
+        <span class="hint-pill">👆 Drag photo to move</span>
+        <span class="hint-pill">🤏 Pinch to zoom</span>
+      </div>
+
+      <div style="margin-top:16px;text-align:center">
+        <span class="size-pill">✓ 500 × 500 px — WhatsApp DP size</span>
+      </div>
+
+      <button class="btn btn-dl" id="dlBtn" onclick="downloadDP()">⬇ Download My DP</button>
+      <button class="btn btn-reset" onclick="changePhoto()">← Change Photo</button>
     </div>
   </div>
+
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
-const BASE_URL = window.location.origin;
-const CIRCLE = { fx: 0.50, fy: 0.308, fr: 0.142 };
+// ═══════════════════════════════════════════════════════════════════════
+// TEMPLATE CONFIG
+// Measured precisely from DP-01.jpeg (2000×2000 px)
+//
+// To update for a new template:
+//   1. Replace public/template.jpg
+//   2. Recalculate:
+//      fx = circleCentreX / imageWidth
+//      fy = circleCentreY / imageHeight
+//      fr = circleInnerRadius / imageWidth   (inner edge, inside the ring)
+//   3. nameOffsetY = how far below circle centre the name sits (fraction of H)
+//      (place it between circle bottom and the horizontal red separator line)
+//   4. output.size: 500=WhatsApp, 720=Facebook, 1080=hi-res
+// ═══════════════════════════════════════════════════════════════════════
+const TMPL = {
+  src: '/template.jpg',
 
-let rawImg = null, tmplImg = null;
-let cs = { x: 0.5, y: 0.5, scale: 1 };
-let isDragging = false, startX, startY, startTouchDist = 0;
+  // Profile photo circle — Perfectly centered
+  circle: {
+    fx: 0.4995,   // Centre-aligns
+    fy: 0.3060,   // Vertical position ensures alignment with existing frame
+    fr: 0.1400,   // INCREASED: Makes the photo larger
+  },
 
-const tmpl = new Image();
-tmpl.src = BASE_URL + '/template.jpg';
-tmpl.onload = () => { tmplImg = tmpl; };
+  // Name text — Calibrated to sit perfectly between circle and red banner
+  name: {
+    // Positioning text at 0.568 pushes it 1 cm down
+    yFrac:    0.548,  // CHANGED: 0.468 -> 0.568 (Moves text down 1 cm)
+    fontSize: 0.050,  // Fractional font size
+    color:    '#C00000', // Matches red theme
+    font:     'bold {size}px serif', // Simple serif for legibility
+    shadow:   'rgba(0,0,0,0.15)', // Subtle shadow
+  },
 
+  // Template has its own rings, so we set external draw rings to 0
+  ring: { color: 'rgba(192,0,0,0.0)', width: 0 }, 
+  output: { size: 500 }, // WhatsApp square DP format
+};
+// ═══════════════════════════════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════════════════════════════
+let rawImg   = null;
+let tmplImg  = null;
+let imgHash  = '';
+let cs       = { x: 0.5, y: 0.5, scale: 1 };
+
+// Interaction state
+let isDragging    = false;
+let dragStartX    = 0, dragStartY = 0;
+let dragStartCsX  = 0, dragStartCsY = 0;
+let isPinching    = false;
+let pinchStartDist  = 0;
+let pinchStartScale = 1;
+
+// ── Pre-load template ────────────────────────────────────────────────
+const _t = new Image();
+_t.onload  = () => { tmplImg = _t; };
+_t.onerror = () => showToast('⚠ Template image failed to load');
+_t.src     = TMPL.src;
+
+// ── File handling ────────────────────────────────────────────────────
 function handleFile(e) {
   const f = e.target.files[0];
+  if (!f || !f.type.startsWith('image/')) return;
+  imgHash = f.name + '_' + f.size;
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
-    img.onload = () => { 
-      rawImg = img; 
+    img.onload = () => {
+      rawImg = img;
       cs = { x: 0.5, y: 0.5, scale: 1 };
+      positionGlow();
+      draw();
       document.getElementById('s1').classList.remove('active');
       document.getElementById('s2').classList.add('active');
-      initInteraction();
-      draw();
+      // Attach interaction ONCE after screen is shown
+      attachInteraction();
     };
     img.src = ev.target.result;
   };
   reader.readAsDataURL(f);
 }
 
-function initInteraction() {
-  const el = document.getElementById('cropHost');
-  let rafActive = false;
+function changePhoto() {
+  rawImg = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('inp-name').value = '';
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+}
 
-  // Optimized Draw Caller
-  function requestDraw() {
-    if (!rafActive) {
-      rafActive = true;
-      requestAnimationFrame(() => {
-        draw();
-        rafActive = false;
-      });
-    }
+// ── Position the invisible glow ring over the photo circle ───────────
+// This gives visual feedback when the user is inside the drag zone.
+function positionGlow() {
+  const host = document.getElementById('cropHost');
+  const glow = document.getElementById('circleGlow');
+  const W    = host.offsetWidth;   // displayed CSS width
+  const H    = host.offsetHeight;
+
+  // Circle centre and radius in CSS pixels
+  const cx = TMPL.circle.fx * W;
+  const cy = TMPL.circle.fy * H;
+  const r  = TMPL.circle.fr * Math.min(W, H);
+
+  glow.style.left   = (cx - r) + 'px';
+  glow.style.top    = (cy - r) + 'px';
+  glow.style.width  = (r * 2)  + 'px';
+  glow.style.height = (r * 2)  + 'px';
+}
+
+// ── Check if a CSS-pixel point is inside the photo circle ─────────────
+// This is the KEY fix: we compare against CSS pixel coords of the host,
+// NOT the canvas's internal pixel coords (which would be 4× larger).
+function isInsideCircle(clientX, clientY) {
+  const host = document.getElementById('cropHost');
+  const rect = host.getBoundingClientRect();
+
+  // Point relative to host in CSS pixels
+  const px = clientX - rect.left;
+  const py = clientY - rect.top;
+
+  // Circle centre and radius in CSS pixels
+  const cx = TMPL.circle.fx * rect.width;
+  const cy = TMPL.circle.fy * rect.height;
+  const r  = TMPL.circle.fr * Math.min(rect.width, rect.height);
+
+  // Add a small touch buffer so it's easy to hit on mobile
+  const buffer = Math.min(rect.width * 0.04, 24);
+
+  return Math.hypot(px - cx, py - cy) <= r + buffer;
+}
+
+// Pinch distance helper
+function pinchDist(e) {
+  const dx = e.touches[0].clientX - e.touches[1].clientX;
+  const dy = e.touches[0].clientY - e.touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+// ── Attach interaction handlers (called once per upload) ──────────────
+let interactionAttached = false;
+function attachInteraction() {
+  if (interactionAttached) return;
+  interactionAttached = true;
+
+  const host = document.getElementById('cropHost');
+  let raf = null;
+  function schedDraw() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => { draw(); raf = null; });
   }
 
-  // Touch Events (Mobile Optimized)
-  el.ontouchstart = e => {
-    isDragging = true;
-    if (e.touches.length === 2) {
-      // Initialize Pinch
-      startTouchDist = Math.hypot(
-        e.touches[0].pageX - e.touches[1].pageX, 
-        e.touches[0].pageY - e.touches[1].pageY
-      );
-    } else {
-      // Initialize Drag
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
+  // ── TOUCH START ──────────────────────────────────────────────────
+  host.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      if (!isInsideCircle(t.clientX, t.clientY)) {
+        // Outside the circle — do nothing, let browser scroll the page
+        isDragging = false;
+        isPinching = false;
+        return;
+      }
+      // Inside circle — take over this gesture
+      e.preventDefault();
+      isDragging    = true;
+      isPinching    = false;
+      dragStartX    = t.clientX;
+      dragStartY    = t.clientY;
+      dragStartCsX  = cs.x;
+      dragStartCsY  = cs.y;
+      host.classList.add('dragging');
+
+    } else if (e.touches.length === 2) {
+      // Two fingers — check if EITHER touch is inside circle
+      const t0 = e.touches[0], t1 = e.touches[1];
+      if (!isInsideCircle(t0.clientX, t0.clientY) &&
+          !isInsideCircle(t1.clientX, t1.clientY)) {
+        isPinching = false;
+        return;
+      }
+      e.preventDefault();
+      isPinching      = true;
+      isDragging      = false;
+      pinchStartDist  = pinchDist(e);
+      pinchStartScale = cs.scale;
+      host.classList.add('dragging');
     }
-  };
+  }, { passive: false });
 
-  el.ontouchmove = e => {
-    e.preventDefault(); // Stop page bounce/scroll
-    if (e.touches.length === 2) {
-      const dist = Math.hypot(
-        e.touches[0].pageX - e.touches[1].pageX, 
-        e.touches[0].pageY - e.touches[1].pageY
-      );
-      
-      // Fast Zoom Sensitivity
-      const zoomFactor = dist / startTouchDist;
-      cs.scale *= Math.pow(zoomFactor, 1.2); // Balanced speed boost
-      startTouchDist = dist;
-    } else if (isDragging) {
-      // Drag Speed Sensitivity
-      const dx = (e.touches[0].clientX - startX) / (el.offsetWidth * cs.scale);
-      const dy = (e.touches[0].clientY - startY) / (el.offsetHeight * cs.scale);
-      cs.x -= dx;
-      cs.y -= dy;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
+  // ── TOUCH MOVE ───────────────────────────────────────────────────
+  host.addEventListener('touchmove', e => {
+    // Only handle if we started inside the circle
+    if (!isDragging && !isPinching) return;
+
+    e.preventDefault();  // stops page scroll while we're editing the photo
+
+    if (isPinching && e.touches.length === 2) {
+      const dist  = pinchDist(e);
+      const ratio = dist / pinchStartDist;
+      cs.scale = Math.max(0.15, Math.min(8, pinchStartScale * ratio));
+
+    } else if (isDragging && e.touches.length >= 1) {
+      const t  = e.touches[0];
+      const host = document.getElementById('cropHost');
+      // Convert pixel delta to fraction-of-canvas-size delta.
+      // Divide by the CSS display size (not the canvas pixel size).
+      const W  = host.offsetWidth;
+      const H  = host.offsetHeight;
+      const dx = (t.clientX - dragStartX) / W;
+      const dy = (t.clientY - dragStartY) / H;
+      cs.x = dragStartCsX - dx;
+      cs.y = dragStartCsY - dy;
     }
-    requestDraw();
-  };
+    schedDraw();
+  }, { passive: false });
 
-  el.ontouchend = () => { isDragging = false; };
+  // ── TOUCH END ────────────────────────────────────────────────────
+  host.addEventListener('touchend', e => {
+    if (e.touches.length === 0) {
+      isDragging = false;
+      isPinching = false;
+      host.classList.remove('dragging');
+    } else if (e.touches.length === 1 && isPinching) {
+      // Went from 2 fingers to 1 — switch to drag mode
+      isPinching   = false;
+      isDragging   = true;
+      dragStartX   = e.touches[0].clientX;
+      dragStartY   = e.touches[0].clientY;
+      dragStartCsX = cs.x;
+      dragStartCsY = cs.y;
+    }
+  }, { passive: true });
 
-  // Mouse Wheel (High Speed)
-  el.onwheel = e => {
+  // ── MOUSE (desktop) ──────────────────────────────────────────────
+  host.addEventListener('mousedown', e => {
+    if (!isInsideCircle(e.clientX, e.clientY)) return;
+    isDragging   = true;
+    dragStartX   = e.clientX;
+    dragStartY   = e.clientY;
+    dragStartCsX = cs.x;
+    dragStartCsY = cs.y;
+    host.classList.add('dragging');
     e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.92 : 1.08; // 8% zoom per notch
-    cs.scale *= delta;
-    cs.scale = Math.max(0.1, Math.min(8, cs.scale));
-    requestDraw();
-  };
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const host = document.getElementById('cropHost');
+    const dx = (e.clientX - dragStartX) / host.offsetWidth;
+    const dy = (e.clientY - dragStartY) / host.offsetHeight;
+    cs.x = dragStartCsX - dx;
+    cs.y = dragStartCsY - dy;
+    schedDraw();
+  });
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      document.getElementById('cropHost').classList.remove('dragging');
+    }
+  });
+
+  // ── MOUSE WHEEL (desktop zoom) ───────────────────────────────────
+  host.addEventListener('wheel', e => {
+    if (!isInsideCircle(e.clientX, e.clientY)) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.92 : 1.08;
+    cs.scale = Math.max(0.15, Math.min(8, cs.scale * delta));
+    schedDraw();
+  }, { passive: false });
+
+  // Reposition glow on resize
+  window.addEventListener('resize', positionGlow);
 }
 
+// ── Draw ─────────────────────────────────────────────────────────────
+// Renders at full template resolution (2000×2000) then CSS scales to fit.
+// Download just calls toDataURL at the same resolution, then we'll draw
+// a 500×500 version for the actual file save.
 function draw() {
-  const cv = document.getElementById('mainCanvas');
+  const cv  = document.getElementById('mainCanvas');
   const ctx = cv.getContext('2d');
-  if(!tmplImg || !rawImg) return;
+  if (!tmplImg || !rawImg) return;
 
-  const size = tmplImg.width;
-  cv.width = size; cv.height = size;
-  ctx.drawImage(tmplImg, 0, 0, size, size);
+  const TW = tmplImg.naturalWidth;   // 2000
+  const TH = tmplImg.naturalHeight;  // 2000
+  cv.width  = TW;
+  cv.height = TH;
 
-  const cx = CIRCLE.fx * size, cy = CIRCLE.fy * size, r = CIRCLE.fr * size;
+  // Draw template
+  ctx.drawImage(tmplImg, 0, 0, TW, TH);
+
+  // Calculate circle in canvas pixel space
+  const cx = TMPL.circle.fx * TW;
+  const cy = TMPL.circle.fy * TH;
+  const r  = TMPL.circle.fr * Math.min(TW, TH);
+
+  // Clip user photo into circle
+  const iw  = rawImg.naturalWidth, ih = rawImg.naturalHeight;
+  const fit = Math.max((r * 2) / iw, (r * 2) / ih) * cs.scale;
+  const sw  = iw * fit, sh = ih * fit;
+  const ox  = cx - sw * cs.x, oy = cy - sh * cs.y;
+
   ctx.save();
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
-
-  const iw = rawImg.width, ih = rawImg.height;
-  const aspect = Math.max((r*2)/iw, (r*2)/ih) * cs.scale;
-  const sw = iw * aspect, sh = ih * aspect;
-  ctx.drawImage(rawImg, cx - sw * cs.x, cy - sh * cs.y, sw, sh);
+  ctx.drawImage(rawImg, ox, oy, sw, sh);
   ctx.restore();
 
-  const name = document.getElementById('inp-name').value;
-  const nameY = cy + r + size * 0.10;
-  ctx.textAlign = 'center';
-  ctx.font = `bold ${Math.round(size * 0.052)}px sans-serif`;
-  ctx.fillStyle = '#C00000';
-  ctx.fillText(name, cx, nameY);
+  // Name text — placed just above the red horizontal separator line
+  const name = (document.getElementById('inp-name').value || '').trim();
+  if (name) {
+    const nameY = TMPL.name.yFrac * TH;
+    const fs    = Math.round(TW * TMPL.name.fontSize);
+    ctx.save();
+    ctx.textAlign   = 'center';
+    ctx.font        = `bold ${fs}px serif`;
+    ctx.fillStyle   = TMPL.name.color;
+    ctx.shadowColor = TMPL.name.shadow;
+    ctx.shadowBlur  = 6;
+    ctx.fillText(name, cx, nameY);
+    ctx.restore();
+  }
 }
 
+// ── Download — exports at exactly 500×500 (WhatsApp DP) ──────────────
 async function downloadDP() {
-  const nameValue = document.getElementById('inp-name').value.trim() || 'User';
-  const cv = document.getElementById('mainCanvas');
+  if (!rawImg || !tmplImg) { showToast('⚠ Please upload a photo first'); return; }
 
-  // 1. Immediate Download (This always works)
+  const btn  = document.getElementById('dlBtn');
+  btn.disabled = true; btn.textContent = 'Generating…';
+
+  // Draw onto a fresh 500×500 canvas
+  const S   = TMPL.output.size;  // 500
+  const out = document.createElement('canvas');
+  out.width = S; out.height = S;
+  const ctx = out.getContext('2d');
+
+  // Scale & centre-crop the template into 500×500
+  const TW = tmplImg.naturalWidth, TH = tmplImg.naturalHeight;
+  const sc = Math.max(S / TW, S / TH);
+  const dw = TW * sc, dh = TH * sc;
+  const dx = (S - dw) / 2, dy = (S - dh) / 2;
+  ctx.drawImage(tmplImg, dx, dy, dw, dh);
+
+  // Remap circle coords into the 500×500 space
+  const cx = TMPL.circle.fx * dw + dx;
+  const cy = TMPL.circle.fy * dh + dy;
+  const r  = TMPL.circle.fr * Math.min(dw, dh);
+
+  // Clip-draw user photo
+  const iw  = rawImg.naturalWidth, ih = rawImg.naturalHeight;
+  const fit = Math.max((r * 2) / iw, (r * 2) / ih) * cs.scale;
+  const sw  = iw * fit, sh = ih * fit;
+  const ox  = cx - sw * cs.x, oy = cy - sh * cs.y;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+  ctx.drawImage(rawImg, ox, oy, sw, sh);
+  ctx.restore();
+
+  // Name in 500×500 space
+  const name = (document.getElementById('inp-name').value || '').trim();
+  if (name) {
+    const nameY = TMPL.name.yFrac * S;
+    const fs    = Math.round(S * TMPL.name.fontSize);
+    ctx.save();
+    ctx.textAlign   = 'center';
+    ctx.font        = `bold ${fs}px serif`;
+    ctx.fillStyle   = TMPL.name.color;
+    ctx.shadowColor = TMPL.name.shadow;
+    ctx.shadowBlur  = 4;
+    ctx.fillText(name, cx, nameY);
+    ctx.restore();
+  }
+
+  await new Promise(r => setTimeout(r, 120));
+
   const link = document.createElement('a');
-  const safeName = nameValue.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-  link.download = `Vardhaman_DP_${safeName}.png`;
-  link.href = cv.toDataURL('image/png', 1.0);
+  const safe = (name || 'user').replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+  link.download = 'Vardhaman_DP_' + safe + '.png';
+  link.href     = out.toDataURL('image/png', 1.0);
   link.click();
 
-  // 2. Background Tracking (Wrapped to never show an alert/error to user)
-  fetch(`${window.location.origin}/api/track`, {
-    method: 'POST',
+  // Background tracking (fire-and-forget)
+  fetch('/api/track', {
+    method:  'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      name: nameValue, 
-      imageHash: typeof imgHash !== 'undefined' ? imgHash : 'no-hash' 
-    })
-  })
-  .then(res => res.json())
-  .then(data => console.log('Tracked:', data))
-  .catch(err => console.warn('Tracking failed but DP was saved:', err));
-  
-  // Show a success toast instead of an error
-  if(typeof showToast === 'function') showToast('✅ DP Saved Successfully!');
+    body: JSON.stringify({
+      email:     'anonymous@vardhaman.dp',
+      name:      name || 'anonymous',
+      imageHash: imgHash,
+    }),
+  }).catch(() => {});
+
+  btn.disabled = false; btn.textContent = '⬇ Download My DP';
+  showToast('✅ DP Downloaded! Share on WhatsApp 🙏');
 }
+
+// ── Toast ─────────────────────────────────────────────────────────────
+function showToast(msg, dur = 3500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── Drag-and-drop on upload zone ──────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) {
+    imgHash = f.name + '_' + f.size;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        rawImg = img;
+        cs = { x: 0.5, y: 0.5, scale: 1 };
+        positionGlow();
+        draw();
+        document.getElementById('s1').classList.remove('active');
+        document.getElementById('s2').classList.add('active');
+        attachInteraction();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(f);
+  }
+});
 </script>
 </body>
 </html>
