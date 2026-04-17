@@ -260,8 +260,8 @@ const TMPL = {
 
   // Profile photo circle — Perfectly centered
   circle: {
-    fx: 0.5070,   // Centre-aligns
-    fy: 0.3000,   // Vertical position ensures alignment with existing frame
+    fx: 0.5050,   // Centre-aligns
+    fy: 0.2950,   // Vertical position ensures alignment with existing frame
     fr: 0.1400,   // INCREASED: Makes the photo larger
   },
 
@@ -358,17 +358,16 @@ function isInsideCircle(clientX, clientY) {
   const host = document.getElementById('cropHost');
   const rect = host.getBoundingClientRect();
 
-  // Point relative to host in CSS pixels
   const px = clientX - rect.left;
   const py = clientY - rect.top;
 
-  // Circle centre and radius in CSS pixels
   const cx = TMPL.circle.fx * rect.width;
   const cy = TMPL.circle.fy * rect.height;
   const r  = TMPL.circle.fr * Math.min(rect.width, rect.height);
 
-  // Add a small touch buffer so it's easy to hit on mobile
-  const buffer = Math.min(rect.width * 0.04, 80);
+  // KEY CHANGE: Buffer is now 2x the radius, 
+  // making the total touchable radius (r + buffer) = 3r.
+  const buffer = r * 1.5; 
 
   return Math.hypot(px - cx, py - cy) <= r + buffer;
 }
